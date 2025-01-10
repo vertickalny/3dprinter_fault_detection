@@ -1,31 +1,64 @@
+
+import os
+import mmap
 import cv2
+import numpy as np
+import time
 
-# Define GStreamer pipeline to read from shared memory
-gst_pipeline = (
-    "shmsrc socket-path=/dev/shm/camera_feed ! videoconvert ! video/x-raw,format=BGR ! appsink"
-)
+# Shared memory path and video properties
+shm_path = "/dev/shm/camera_feed"
+frame_width = 640
+frame_height = 480
+frame_format = "BGR"  # Matches GStreamer format
+frame_size = frame_width * frame_height * 3  # Width x Height x Channels
 
-# Open the pipeline as a video capture device
-cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+def read_shared_memory(shm_path, frame_size):
+    """
+    Reads a frame from shared memory.
+    """
+    try:
+        # Open the shared memory file in read-only mode
+        with open(shm_path, "rb") as shm_file:
+            with mmap.mmap(shm_file.fileno(), frame_size, access=mmap.ACCESS_READ) as shm:
+                # Read raw frame data from shared memory
+                frame_data = shm.read(frame_size)
+                shm.seek(0)  # Reset pointer for next read
+                return frame_data
+    except Exception as e:
+        print(f"Error accessing shared memory: {e}")
+        return None
 
-if not cap.isOpened():
-    print("Error: Unable to connect to the shared memory stream.")
-    exit()
+def main():
+    print("Press 'q' to quit.")
+    
+    # Check if shared memory exists
+    if not os.path.exists(shm_path):
+        print(f"Shared memory file {shm_path} does not exist!")
+        return
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("End of stream or error.")
-        break
+    while True:
+        # Read frame data from shared memory
+        frame_data = read_shared_memory(shm_path, frame_size)
+        if frame_data is None:
+            time.sleep(0.1)  # Wait before retrying
+            continue
 
-    # Display the frame
-    cv2.imshow("Shared Memory Frame", frame)
+        try:
+            # Convert raw data to NumPy array and reshape to frame dimensions
+            frame = np.frombuffer(frame_data, dtype=np.uint8).reshape((frame_height, frame_width, 3))
 
-    # Press 'q' to exit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+            # Display the frame using OpenCV
+            cv2.imshow("Shared Memory Video Feed", frame)
+        except Exception as e:
+            print(f"Error processing frame: {e}")
+            continue
 
-# Cleanup
-cap.release()
-cv2.destroyAllWindows()
+        # Exit when 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
 
