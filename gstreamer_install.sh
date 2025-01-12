@@ -1,1 +1,10 @@
-sudo apt-get install gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+sudo apt-get install --quiet -y --no-install-recommends \
+  gstreamer1.0-gl \
+  gstreamer1.0-opencv \
+  gstreamer1.0-plugins-bad \
+  gstreamer1.0-plugins-good \
+  gstreamer1.0-plugins-ugly \
+  gstreamer1.0-tools \
+  libgstreamer-plugins-base1.0-dev \
+  libgstreamer1.0-0 \
+  libgstreamer1.0-dev \
