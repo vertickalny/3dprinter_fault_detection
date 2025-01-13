@@ -1,4 +1,3 @@
-
 import cv2
 import time
 import os
@@ -6,7 +5,7 @@ from ultralytics import YOLO
 
 def main():
     # Load the YOLO model
-    model = YOLO('best2.pt')
+    model = YOLO('model_final.pth')
     conf_threshold = 0.3
 
     # Define the GStreamer pipeline
@@ -78,9 +77,13 @@ def main():
             # Calculate FPS
             new_frame_time = time.time()
             fps = 1 / (new_frame_time - prev_frame_time)
+            print("fps = ", fps)
             prev_frame_time = new_frame_time
             fps = int(fps)
-            cv2.putText(frame, f"FPS: {fps}", (10, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            fps = str(fps)
+
+            print("FPS: ", fps)
+            cv2.putText(frame, fps, (10, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             # Process frames at intervals
             current_time = time.time()

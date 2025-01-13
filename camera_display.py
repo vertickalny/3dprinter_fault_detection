@@ -12,8 +12,8 @@ def main():
     if not camera.isOpened():
         print("Error: Cannot access the camera.")
         return
-    #camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    #camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     # Variables for FPS calculation
     frame_count = 0
     start_time = time.time()
