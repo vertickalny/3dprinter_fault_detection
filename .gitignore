@@ -1,17 +1,11 @@
 # Ignore virtual environment
 venv/
 
-# Ignore large model files
-model_final.pth
-best2.pt
+# Ignore __pycache__ directories
+__pycache__/
 
-# Ignore detections and frames
-detections/
-frames/
+# Ignore Python bytecode files
+*.pyc
+*.pyo
 
-# Other ignored files
-*.pth
-*.pt
-*.rst
-*.yaml
 

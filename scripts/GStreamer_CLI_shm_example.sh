@@ -1,0 +1,7 @@
+#Producer:
+gst-launch-1.0 v4l2src device=/dev/video0 ! videoconvert ! video/x-raw,format=BGR,width=640,height=480,framerate=30/1 ! shmsink socket-path=/dev/shm/camera_feed sync=false wait-for-connection=false shm-size=20000000
+
+#Consumer: 
+gst-launch-1.0 shmsrc socket-path=/dev/shm/camera_feed ! video/x-raw,format=BGR,width=640,height=480,framerate=30/1 ! videoconvert ! autovideosink
+
+
