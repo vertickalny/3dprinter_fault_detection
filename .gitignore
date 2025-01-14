@@ -13,4 +13,5 @@ frames/
 *.pth
 *.pt
 *.rst
+*.yaml
 
