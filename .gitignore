@@ -1,1 +1,16 @@
+# Ignore virtual environment
 venv/
+
+# Ignore large model files
+model_final.pth
+best2.pt
+
+# Ignore detections and frames
+detections/
+frames/
+
+# Other ignored files
+*.pth
+*.pt
+*.rst
+
