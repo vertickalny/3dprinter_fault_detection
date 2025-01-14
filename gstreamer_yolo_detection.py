@@ -5,7 +5,7 @@ from ultralytics import YOLO
 
 def main():
     # Load the YOLO model
-    model = YOLO('model_final.pth')
+    model = YOLO('best2.pt')
     conf_threshold = 0.3
 
     # Define the GStreamer pipeline
@@ -106,4 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
