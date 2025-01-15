@@ -1,6 +1,6 @@
 ---
 
-```markdown
+
 # 3D Printer Fault Detection for SpaceVela
 
 This project is part of the **SpaceVela** initiative, designed to detect anomalies in 3D printer operations by analyzing captured images using AI-based object detection models, including YOLO and Detectron2. The system processes images(taken from a camera) and provides annotated outputs highlighting detected faults.
