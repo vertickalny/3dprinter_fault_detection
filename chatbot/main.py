@@ -4,6 +4,7 @@ import os  # To interact with the filesystem
 
 bot = telebot.TeleBot('REDACTED')  # Replace with your bot token
 
+
 @bot.message_handler(commands=['start'])
 def main(message):
     os_type = platform.system()  # Get the OS type
