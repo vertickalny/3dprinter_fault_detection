@@ -137,9 +137,3 @@ Developed by **Abay Kulamkadyr** for the **SpaceVela Project**.
 
 ---
 
-### **Key Updates**
-1. **OpenCV Build Reference**: Added a link to `/scripts/README.md` for detailed OpenCV build instructions.
-2. **Repository Structure**: Matches your actual repository layout.
-3. **Streamlined Installation**: Clearly guides users on prerequisites and setup steps.
-
-Let me know if further changes are needed!
