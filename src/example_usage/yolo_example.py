@@ -1,6 +1,6 @@
 # Example usage for YOLODetection
 # first in command line, type export PYTHONPATH=$(pwd)/..
-from src.detection.yolo_detection import YOLODetection
+from detection.yolo_detection import YOLODetection
 
 def run_yolo_example():
     gst_pipeline = (
