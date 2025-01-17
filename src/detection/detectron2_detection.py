@@ -6,6 +6,7 @@ from detectron2.engine import DefaultPredictor
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog
 from detectron2 import model_zoo
+from utils.camera_gstreamer_module import CameraGStreamerPipeline     
 
 class Detectron2Detection:
     def __init__(self, weights_file, detections_dir, device="cpu", threshold=0.5):
@@ -56,32 +57,20 @@ class Detectron2Detection:
             return frame
 
 def main():
-    gst_pipeline = (
-        "v4l2src device=/dev/video0 ! "
-        "image/jpeg, width=640, height=480, framerate=30/1 ! "
-        "jpegdec ! videoconvert ! appsink"
-    )
-
-    weights_file = "../../data/models/model_final.pth"
-    detections_dir = "../../data/detections"
+    weights_file = "../data/models/model_final.pth"
+    detections_dir = "../data/detections"
 
     detectron2_detection = Detectron2Detection(weights_file, detections_dir)
 
-    #detectron2_detection.process_folder_with_pause("../../data/samples/tests/")
-    cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
-    if not cap.isOpened():
-        print("Error: Unable to open camera with GStreamer pipeline.")
-        return
-
-    prev_frame_time = 0
-    last_detection_time = time.time()
+    gstreamer = CameraGStreamerPipeline()     
 
     try:
+        gstreamer.open_pipeline()
+        prev_frame_time = 0
+        last_detection_time = time.time()
+
         while True:
-            ret, frame = cap.read()
-            if not ret:
-                print("Error: Unable to capture frame.")
-                break
+            frame = gstreamer.read_frame()
 
             # Calculate FPS
             new_frame_time = time.time()
@@ -96,6 +85,8 @@ def main():
                 print("Running detection...")
                 img_counter = int(time.time())  # Use current time as image counter
                 frame = detectron2_detection.process_frame(frame, img_counter)
+                if frame is None:  # Exit if 'q' was pressed during fault detection
+                    break
                 last_detection_time = current_time
 
             # Display the live feed
@@ -106,7 +97,7 @@ def main():
                 break
 
     finally:
-        cap.release()
+        gstreamer.close_pipeline()
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
