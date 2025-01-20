@@ -1,37 +1,63 @@
+import os
 import telebot
-import platform
-import os  # To interact with the filesystem
+import requests
+from klippy_api.KlippyAPI import KlippyAPI
 
-bot = telebot.TeleBot('REDACTED')  # Replace with your bot token
+def main() -> None:
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+    bot = telebot.TeleBot(BOT_TOKEN)
+    
+    base_url = "http://192.168.31.100:7125"
+    klippy = KlippyAPI(base_url)
 
+    @bot.message_handler(commands=['start', 'hello'])
+    def send_welcome(message):
+        print(message.chat.id)
+        bot.reply_to(message, "Howdy, how are you doing?")
 
-@bot.message_handler(commands=['start'])
-def main(message):
-    os_type = platform.system()  # Get the OS type
-    bot.send_message(message.chat.id, f"Immediately. The 3D printer is working with a defect. It will be stopped. OS: {os_type}")
+    @bot.message_handler(commands=['info'])
+    def get_info(message):
+        print("info command is invoked")
+        printer_info = klippy.get_printer_info()
+        bot.reply_to(message, printer_info)
 
-@bot.message_handler(commands=['image'])
-def send_images(message):
-    folder_path = '/home/zhan/3dprinter_camera_capture/detections'  # Replace with the absolute path to your folder
-    try:
-        # Check if the folder exists
-        if not os.path.exists(folder_path):
-            bot.send_message(message.chat.id, "The specified folder does not exist. Please check the path.")
-            return
+    @bot.message_handler(commands=['list'])
+    def list(message):
+        print("list command is invoked")
+        printer_objects = klippy.list_printer_objects()
+        bot.reply_to(message, "Printer Objest:" + printer_objects)
 
-        # List all files in the folder
-        files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-        if not files:
-            bot.send_message(message.chat.id, "No images found in the folder.")
-            return
+    @bot.message_handler(commands=['restart_host'])
+    def restart_host(message):
+        print("restart host command is invoked")
+        response = klippy.restart_host()
+        bot.reply_to(message, "Printer's response: " + response)
+    
+    @bot.message_handler(commands=['restart_firmware'])
+    def restart_firmware(message):
+        print("restart firmware command is invoked")
+        response = klippy.firmware_restart()
+        bot.reply_to(message, "Printer's response: " + response)
 
-        # Send each image
-        for file_name in files:
-            file_path = os.path.join(folder_path, file_name)
-            with open(file_path, 'rb') as photo:
-                bot.send_photo(message.chat.id, photo, caption=f"Image: {file_name}")
+    @bot.message_handler(commands=['extruder'])
+    def get_extruder(message):
+        print("extruder firmware command is invoked")
+        status = klippy.query_printer_object_status({"gcode_move": None, "toolhead": None, "extruder": "target,temperature"})
+        bot.reply_to(message, "Printer status: " + status)
 
-    except Exception as e:
-        bot.send_message(message.chat.id, f"An error occurred: {e}")
+    @bot.message_handler(commands=['stop'])
+    def emergency_stop(message):
+        print("emergency stop command is invoked")
+        response = klippy.emergency_stop()     
+        bot.reply_to(message, "Printer's response: " + response)
 
-bot.polling(none_stop=True)
+    @bot.message_handler(func=lambda msg: True)
+    def echo_all(message):
+        bot.reply_to(message, message.text)
+    
+    #to launch bot
+    bot.infinity_polling()
+
+    
+if __name__ == '__main__':
+    main()
