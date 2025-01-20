@@ -10,29 +10,37 @@ This project is part of the **SpaceVela** initiative, designed to detect anomali
 ## Repository Structure
 
 ```plaintext
-3dprinter_fault_detection/
-├── data/
+3dprinter_camera_capture/
+├── chatbot/                    # Chatbot for fault notifications
+│   └── bot.py                 # Entry point for chatbot
+├── configs/                    # Configuration files for models
+│   ├── mask_rcnn_X_101_32x8d_FPN_3x.yaml
+│   └── Base-RCNN-FPN.yaml
+├── data/                       # Data directory
 │   ├── models/                 # Pre-trained models
 │   │   ├── best2.pt            # YOLO model
 │   │   └── model_final.pth     # Detectron2 model
-│   ├── samples/                # Input samples
-│   │   └── tests/              # Test images with defects
-├── examples/
-│   ├── run_yolo_detection.py   # YOLO example script
-│   ├── run_detectron2_detection.py # Detectron2 example script
-├── scripts/
-│   ├── install_gstreamer.sh    # GStreamer installation script
-│   ├── build_opencv_with_gstreamer.sh # Build OpenCV with GStreamer
-│   ├── README.md               # Detailed OpenCV build instructions
-├── tests/                      # Test suite for modules
+│   └── detections/             # Detected fault images (dynamic)
+├── scripts/                    # Utility scripts
+│   ├── gstreamer_install.sh    # GStreamer installation script
+│   ├── install_opencv_dependencies.sh # OpenCV dependency installation
+│   └── README.md               # OpenCv-Python with Gstreamer installation 
 ├── src/                        # Application source code
-│   ├── camera.py               # Camera handling module
-│   ├── detection/
-│   │   ├── yolo_detection.py   # YOLO detection module
-│   │   └── detectron2_detection.py  # Detectron2 detection module
+│   ├── detection/              # Detection modules
+│   │   ├── yolo_detection.py
+│   │   └── detectron2_detection.py
+│   ├── klippy_api/             # Klippy API integration
+│   │   └── KlippyAPI.py
+│   ├── example_usage/          # Usage examples
+│   │   ├── detectron2_example.py
+│   │   └── yolo_example.py
+│   ├── utils/                  # Utility modules
+│   │   ├── camera_gstreamer_module.py
+│   │   └── gstreamer_youtube_stream_test_example.py
+│   └── main.py                 # Main script
+├── requirements.txt            # Python dependencies
 ├── LICENSE                     # MIT License
 ├── README.md                   # Project documentation
-├── requirements.txt            # Python dependencies
 ```
 
 ---
