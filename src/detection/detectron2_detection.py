@@ -9,11 +9,12 @@ from detectron2 import model_zoo
 from utils.camera_gstreamer_module import CameraGStreamerPipeline     
 
 class Detectron2Detection:
-    def __init__(self, weights_file, detections_dir, device="cpu", threshold=0.5):
+    def __init__(self, weights_file, detections_dir, device="cpu", threshold=0.5, detection_callback=None):
         self.cfg = self.setup_config(weights_file, threshold, device)
         self.predictor = DefaultPredictor(self.cfg)
         self.detections_dir = detections_dir
         os.makedirs(detections_dir, exist_ok=True)
+        self.detection_callback = detection_callback
 
     def setup_config(self, weights_file, threshold, device):
         cfg = get_cfg()
@@ -22,7 +23,6 @@ class Detectron2Detection:
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
         cfg.MODEL.DEVICE = device
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-        
         MetadataCatalog.get("custom_metadata").set(thing_classes=["fail"])
         return cfg
 
@@ -44,10 +44,15 @@ class Detectron2Detection:
             cv2.imwrite(detection_path, detection_frame)
             print(f"Detection image saved to: {detection_path}")
 
+            #Callback function
+            if self.detection_callback:
+                self.detection_callback(detection_path)
+
             # Pause if a fault is detected
             cv2.imshow("Fault Detected", detection_frame)
             print("Fault detected. Press any key to continue or 'q' to exit.")
             key = cv2.waitKey(0)  # Wait indefinitely for a key press
+
             if key == ord('q'):
                 print("Exiting detection loop.")
                 return None
