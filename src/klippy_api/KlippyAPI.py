@@ -31,6 +31,18 @@ class KlippyAPI:
         response.raise_for_status()
         return response.text
 
+    def pause(self):
+        url = f"{self.base_url}/printer/print/pause"
+        response = requests.post(url)
+        response.raise_for_status()
+        return response.text
+
+    def resume(self):
+        url = f"{self.base_url}/printer/print/resume"
+        response = requests.post(url)
+        response.raise_for_status()
+        return response.text
+            
     def restart_host(self):
         """
         Restart the Klippy host.

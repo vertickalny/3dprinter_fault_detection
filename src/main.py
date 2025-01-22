@@ -44,7 +44,7 @@ def main():
     detectron2_detection = Detectron2Detection(weights_file, detections_dir, detection_callback=notify_on_detection)
 
     gstreamer = CameraGStreamerPipeline()     
-    DETECTION_INTERVAL = 20
+    DETECTION_INTERVAL = 120 
 
     try:
         gstreamer.open_pipeline()
