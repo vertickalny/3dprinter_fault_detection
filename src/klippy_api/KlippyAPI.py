@@ -1,13 +1,35 @@
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
 
 class KlippyAPI:
     def __init__(self, base_url):
         """
-        Initialize the Klippy API client.
+        Initialize the Klippy API client with retry logic.
 
         :param base_url: Base URL of the Klippy server (e.g., http://hostname:port).
         """
         self.base_url = base_url
+        self.session = self._create_session()
+
+    def _create_session(self):
+        """
+        Create a session with retry logic.
+
+        :return: Configured requests session.
+        """
+        retries = Retry(
+            total=5,                # Retry 5 times
+            backoff_factor=1,       # 1 second delay between retries
+            status_forcelist=[500, 502, 503, 504],  # Retry on server errors
+            allowed_methods=["GET", "POST"]       # Retry for these methods
+        )
+        session = requests.Session()
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        return session
 
     def get_printer_info(self):
         """
@@ -16,7 +38,7 @@ class KlippyAPI:
         :return: JSON response containing printer info.
         """
         url = f"{self.base_url}/printer/info"
-        response = requests.get(url)
+        response = self.session.get(url)
         response.raise_for_status()
         return response.json()
 
@@ -27,22 +49,32 @@ class KlippyAPI:
         :return: Response text (should be 'ok').
         """
         url = f"{self.base_url}/printer/emergency_stop"
-        response = requests.post(url)
+        response = self.session.post(url)
         response.raise_for_status()
         return response.text
 
     def pause(self):
+        """
+        Pause the print.
+
+        :return: Response text.
+        """
         url = f"{self.base_url}/printer/print/pause"
-        response = requests.post(url)
+        response = self.session.post(url)
         response.raise_for_status()
         return response.text
 
     def resume(self):
+        """
+        Resume the print.
+
+        :return: Response text.
+        """
         url = f"{self.base_url}/printer/print/resume"
-        response = requests.post(url)
+        response = self.session.post(url)
         response.raise_for_status()
         return response.text
-            
+
     def restart_host(self):
         """
         Restart the Klippy host.
@@ -50,7 +82,7 @@ class KlippyAPI:
         :return: Response text (should be 'ok').
         """
         url = f"{self.base_url}/printer/restart"
-        response = requests.post(url)
+        response = self.session.post(url)
         response.raise_for_status()
         return response.text
 
@@ -61,7 +93,7 @@ class KlippyAPI:
         :return: Response text (should be 'ok').
         """
         url = f"{self.base_url}/printer/firmware_restart"
-        response = requests.post(url)
+        response = self.session.post(url)
         response.raise_for_status()
         return response.text
 
@@ -72,7 +104,7 @@ class KlippyAPI:
         :return: JSON response containing available printer objects.
         """
         url = f"{self.base_url}/printer/objects/list"
-        response = requests.get(url)
+        response = self.session.get(url)
         response.raise_for_status()
         return response.json()
 
@@ -88,11 +120,12 @@ class KlippyAPI:
             f"{key}={value}" if value else f"{key}" for key, value in query_params.items()
         )
         url = f"{self.base_url}/printer/objects/query?{query_string}"
-        response = requests.get(url)
+        response = self.session.get(url)
         response.raise_for_status()
         return response.json()
 
-# Example usage:
+
+# Example usage
 if __name__ == "__main__":
     base_url = "http://192.168.31.100:7125"
     klippy = KlippyAPI(base_url)
@@ -112,3 +145,4 @@ if __name__ == "__main__":
 
     except requests.exceptions.RequestException as e:
         print("An error occurred:", e)
+

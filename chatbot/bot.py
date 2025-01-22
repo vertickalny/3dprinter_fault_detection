@@ -3,6 +3,13 @@ import telebot
 import requests
 from klippy_api.KlippyAPI import KlippyAPI
 
+def compose_message(dic) -> str: 
+    res = ""
+    for key, value in dic.items():
+        res += f"{key}: {value}"
+
+    return res
+
 def main() -> None:
     BOT_TOKEN = os.environ.get('BOT_TOKEN')
     CHAT_ID = int(os.environ.get('CHAT_ID'))
@@ -24,9 +31,10 @@ def main() -> None:
     def get_info(message):
         print("info command is invoked")
         printer_info = klippy.get_printer_info()
+        res = ""
 
         if(message.chat.id == CHAT_ID):   
-            bot.reply_to(message, printer_info)
+            bot.reply_to(message, compose_message(printer_info))
 
     @bot.message_handler(commands=['list'])
     def list(message):
@@ -55,7 +63,7 @@ def main() -> None:
         status = klippy.query_printer_object_status({"gcode_move": None, "toolhead": None, "extruder": "target,temperature"})
 
         if(message.chat.id == CHAT_ID):   
-            bot.reply_to(message, "Printer status: " + status)
+            bot.reply_to(message, "Printer status: " + compose_message(status))
 
     @bot.message_handler(commands=['emergency_stop'])
     def emergency_stop(message):
@@ -74,9 +82,9 @@ def main() -> None:
             bot.reply_to(message, message.text)
 
     @bot.message_handler(commands=['resume'])
-    def pause(message):
+    def resume(message):
         print("Resuming printing")
-        response = klippy.pause()
+        response = klippy.resume()
         if(message.chat.id == CHAT_ID):   
             bot.reply_to(message, message.text)
 
