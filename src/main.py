@@ -35,7 +35,15 @@ def notify_on_detection(image_path):
     bot_token = os.environ.get('BOT_TOKEN')
     chat_id = os.environ.get('CHAT_ID')
     message = "⚠️ Fault detected during 3D printing! ⚠️"
-    send_telegram_notification(bot_token, chat_id, message, image_path)
+    CHAT_IDS = [
+        1969139002,     
+        1430460059,     
+        52338470,
+        1430460059,
+    ]
+
+    for chat_id in CHAT_IDS:
+        send_telegram_notification(bot_token, chat_id, message, image_path)
 
 def main():
     weights_file = "../data/models/model_final.pth"

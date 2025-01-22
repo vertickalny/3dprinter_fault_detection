@@ -3,6 +3,13 @@ import telebot
 import requests
 from klippy_api.KlippyAPI import KlippyAPI
 
+CHAT_IDS = [
+    1969139002,     
+    1430460059,     
+    52338470,
+    1430460059,
+]
+
 def compose_message(dic) -> str: 
     res = ""
     for key, value in dic.items():
@@ -22,7 +29,7 @@ def main() -> None:
     def send_welcome(message):
         print(message.chat.id)
         print(os.environ.get('CHAT_ID'))
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, "Howdy, how are you doing?")
         else:
             print("not equal")
@@ -33,7 +40,7 @@ def main() -> None:
         printer_info = klippy.get_printer_info()
         res = ""
 
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, compose_message(printer_info))
 
     @bot.message_handler(commands=['list'])
@@ -47,14 +54,14 @@ def main() -> None:
         print("restart host command is invoked")
         response = klippy.restart_host()
 
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, "Printer's response: " + response)
     
     @bot.message_handler(commands=['restart_firmware'])
     def restart_firmware(message):
         print("restart firmware command is invoked")
         response = klippy.firmware_restart()
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, "Printer's response: " + response)
 
     @bot.message_handler(commands=['extruder'])
@@ -78,14 +85,14 @@ def main() -> None:
         print("Pausing print")
         response = klippy.pause()
 
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, message.text)
 
     @bot.message_handler(commands=['resume'])
     def resume(message):
         print("Resuming printing")
         response = klippy.resume()
-        if(message.chat.id == CHAT_ID):   
+        if(message.chat.id in CHAT_IDS):   
             bot.reply_to(message, message.text)
 
 
